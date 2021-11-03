@@ -32,7 +32,7 @@
 from kedro.pipeline import Pipeline, node
 
 from test_car_crash.nodes.primary import unix_to_datetime, prm_spine
-from test_car_crash.nodes.feature import fea_total_miles,fea_rush_hour_ratio
+from test_car_crash.nodes.feature import fea_total_miles, fea_rush_hour_ratio, fea_prev_crash
 from test_car_crash.nodes.model_input import mod_master
 
 
@@ -46,9 +46,10 @@ def create_pipeline(**kwargs):
             ),  # spine will be at the unit of analysis
             node(fea_total_miles, ["prm_spine", "prm_car_location"], "fea_total_miles"),
             node(fea_rush_hour_ratio, ["prm_spine", "prm_car_location"], "fea_rush_hour_ratio"),
+            node(fea_prev_crash, ["prm_spine", "prm_car_crash"], "fea_prev_crash"),
             node(
                 mod_master,
-                inputs=["prm_spine", "fea_total_miles","fea_rush_hour_ratio"],
+                inputs=["prm_spine", "fea_total_miles","fea_rush_hour_ratio", "fea_prev_crash"],
                 outputs="mod_master",
             ),
         ]

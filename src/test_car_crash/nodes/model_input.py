@@ -16,7 +16,8 @@
 def mod_master(
     df_spine,
     df_total_miles,
-    df_fea_rush_hour_ratio
+    df_fea_rush_hour_ratio,
+    df_fea_prev_crash
 ):
 
     key_cols = ("driver_id", "mod_start_date")
@@ -25,6 +26,7 @@ def mod_master(
         df_spine
         .join(df_total_miles, [*key_cols], "left")
         .join(df_fea_rush_hour_ratio, [*key_cols], "left")
+        .join(df_fea_prev_crash,[*key_cols], "left")
     )
 
     return df_joined

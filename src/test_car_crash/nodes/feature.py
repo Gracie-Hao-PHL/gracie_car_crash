@@ -106,7 +106,7 @@ def fea_rush_hour_ratio(df_spine, df_location):
             df_fea_rush_hour_ratio (spark dataframe): Ratio of rush hour driving vs non rush hour driving during the modeling period 
 
     """
-#    df_location = df_location.withColumn("date_time", F.to_timestamp(df_location.unix_time / 1000))
+    #df_location = df_location.withColumn("date_time", F.to_timestamp(df_location.unix_time / 1000))
 
     # Filter location data between mod_start_date and mod_end_date
     df_location_filtered = df_spine.join(
@@ -132,3 +132,24 @@ def fea_rush_hour_ratio(df_spine, df_location):
             .select("driver_id", "mod_start_date", "rush_hour_ratio")
     )
     return df_fea_rush_hour_ratio
+
+def fea_prev_crash(df_spine, df_crash):
+    """Calculate the number of crashes each driver had during the modeling period
+
+    Args:
+        df_spine (spark dataframe): [description]
+        df_crash (spark dataframe): [description]
+
+    Returns:
+        df_fea_prev_crash(spark dataframe): [description]
+    """
+    df_fea_prev_crash = df_spine\
+        .join(df_crash,\
+            ((df_spine.driver_id == df_crash.driver_id)\
+            & (df_crash['dt_time'].between(df_spine.mod_start_date, df_spine.mod_end_date))),\
+            'left').drop(df_spine.driver_id)\
+        .withColumnRenamed('dt_time', 'crash_ts')\
+        .select("driver_id", "mod_start_date","crash", "source", "crash_ts")
+
+    return df_fea_prev_crash
+
